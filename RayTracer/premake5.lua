@@ -14,6 +14,8 @@ project "RayTracer"
       "../Walnut/vendor/glm",
 
       "../Walnut/Walnut/src",
+      "external/spdlog/include",
+      "external/stb",
 
       "%{IncludeDir.VulkanSDK}",
    }
