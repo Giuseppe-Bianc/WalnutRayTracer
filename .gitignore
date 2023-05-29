@@ -11,3 +11,19 @@ bin-int/
 
 # Exclude
 !vendor/bin
+/RayTracer/external/spdlog/.github/workflows
+/RayTracer/external/spdlog/cmake
+/RayTracer/external/spdlog/example
+/RayTracer/external/spdlog/bench
+/RayTracer/external/spdlog/logos
+/RayTracer/external/spdlog/scripts
+/RayTracer/external/spdlog/tests
+/RayTracer/external/spdlog/.clang-format
+/RayTracer/external/spdlog/.clang-tidy
+/RayTracer/external/spdlog/.gitattributes
+/RayTracer/external/spdlog/.gitignore
+/RayTracer/external/spdlog/appveyor.yml
+/RayTracer/external/spdlog/CMakeLists.txt
+/RayTracer/external/spdlog/INSTALL
+/RayTracer/external/spdlog/LICENSE
+/RayTracer/external/spdlog/README.md
