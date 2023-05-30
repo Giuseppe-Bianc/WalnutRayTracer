@@ -27,3 +27,6 @@ bin-int/
 /RayTracer/external/spdlog/INSTALL
 /RayTracer/external/spdlog/LICENSE
 /RayTracer/external/spdlog/README.md
+/RayTracer/external/opencv/build/etc/haarcascades
+/RayTracer/external/opencv/build/etc/lbpcascades
+/RayTracer/external/opencv/build/etc/licenses
