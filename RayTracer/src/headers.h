@@ -20,6 +20,7 @@
 #pragma warning(disable : 6386 6385)
 #endif
 
+#include <opencv2/opencv.hpp>
 #include <omp.h>
 #include <iterator>
 #include <execution>
@@ -58,7 +59,6 @@
 #include <string_view>
 #include <unordered_set>
 #include <vector>
-
 // Restore warning levels.
 #ifdef _MSC_VER
 // Microsoft Visual C++ Compiler

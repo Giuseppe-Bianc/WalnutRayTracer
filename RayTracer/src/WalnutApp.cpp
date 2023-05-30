@@ -3,38 +3,8 @@
 
 #include "Walnut/Image.h"
 #include "headers.h"
-#include "rstb_image.h"
-#include <opencv2/opencv.hpp>
+#include "Timer.h"
 //#define LOG_PROGRESS
-class Timer {
-public:
-	explicit Timer(std::string_view msg) : message(msg) {
-		startTimePoint = std::chrono::high_resolution_clock::now();
-	}
-
-	#pragma optimize("gt", on)
-	inline void Stop() noexcept {
-		auto endTimePoint = std::chrono::high_resolution_clock::now();
-		auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(startTimePoint).time_since_epoch().count();
-		auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(endTimePoint).time_since_epoch().count();
-		auto duration = end - start;
-
-		auto minutes = duration / kNanoSecondsInMinute;
-		auto seconds = (duration % kNanoSecondsInMinute) / kNanoSecondsInSecond;
-		auto milliseconds = (duration % kNanoSecondsInSecond) / kNanoSecondsInMillisecond;
-		auto microseconds = (duration % kNanoSecondsInMillisecond) / kNanoSecondsInMicrosecond;
-		auto nanoseconds = duration % kNanoSecondsInMicrosecond;
-		//RTINFO("Rendering done in: {}.{:02d}.{:03d}.{:03d}.{:03d}", minutes, seconds, milliseconds, microseconds, nanoseconds);
-		RTINFO("{} done in: {}:{:02d}.{:03d}.{:03d}.{:03d}", message, minutes, seconds, milliseconds, microseconds, nanoseconds);
-	}
-	~Timer() {
-		Stop();
-	}
-
-private:
-	std::string_view message;
-	std::chrono::time_point<std::chrono::high_resolution_clock> startTimePoint;
-};
 
 class RayTracerLayer : public Walnut::Layer
 {
@@ -67,7 +37,7 @@ private:
 	//std::vector<uint32_t> image_data;
 };
 
-// Function to generate a PNG image with random pixels
+// Function to generate a PNG image
 #pragma optimize("gt", on)
 void generatePNGImage(const char* filename) {
 	// Creazione di un'immagine nera

@@ -15,7 +15,6 @@ project "RayTracer"
 
       "../Walnut/Walnut/src",
       "external/spdlog/include",
-      "external/stb",
       "external/opencv/build/include",
 
       "%{IncludeDir.VulkanSDK}",
