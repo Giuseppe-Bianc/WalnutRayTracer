@@ -16,13 +16,19 @@ project "RayTracer"
       "../Walnut/Walnut/src",
       "external/spdlog/include",
       "external/stb",
+      "external/opencv/build/include",
 
       "%{IncludeDir.VulkanSDK}",
    }
 
+   libdirs {
+      "external/opencv/build/x64/vc16/lib"  -- Replace with the path to your OpenCV library directory
+   }
+
    links
    {
-       "Walnut"
+       "Walnut",
+       "opencv_world470d"
    }
 
    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")

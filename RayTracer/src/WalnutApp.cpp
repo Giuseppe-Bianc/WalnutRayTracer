@@ -4,14 +4,15 @@
 #include "Walnut/Image.h"
 #include "headers.h"
 #include "rstb_image.h"
-
-
+#include <opencv2/opencv.hpp>
+//#define LOG_PROGRESS
 class Timer {
 public:
-	Timer(std::string_view msg) : message(msg) {
+	explicit Timer(std::string_view msg) : message(msg) {
 		startTimePoint = std::chrono::high_resolution_clock::now();
 	}
 
+	#pragma optimize("gt", on)
 	inline void Stop() noexcept {
 		auto endTimePoint = std::chrono::high_resolution_clock::now();
 		auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(startTimePoint).time_since_epoch().count();
@@ -42,14 +43,17 @@ public:
 	}
 	virtual void OnUIRender() override
 	{
-		ImGui::Begin(VKRT::windowTitle.data(), nullptr, ImGuiWindowFlags_NoDecoration);
-		ImGui::Image(image->GetDescriptorSet(), ImVec2((float)image->GetWidth(), (float)image->GetHeight()));
+		ImGui::Begin(VKRT::windowTitle.data());
+		ImGui::Image(image->GetDescriptorSet(), ImVec2(CAST_F(image->GetWidth()), CAST_F(image->GetHeight())));
 		ImGui::End();
 	}
 
 	RayTracerLayer() {
 		//image_data.resize(VKRT::ST_w * VKRT::ST_h, 0);
-		image = std::make_shared<Walnut::Image>("texture.png");
+		{
+			Timer timer("Image loaded in memory");
+			image = std::make_shared<Walnut::Image>("texture.png");
+		}
 	}
 
 private:
@@ -64,39 +68,35 @@ private:
 };
 
 // Function to generate a PNG image with random pixels
-#pragma omp parallel for
-#pragma optimize("t", on)
-void generatePNGImage(const char* filename)
-{
-	std::vector<unsigned char> imageData(VKRT::dataSize);
-	std::size_t index = 0;
+#pragma optimize("gt", on)
+void generatePNGImage(const char* filename) {
+	// Creazione di un'immagine nera
+	cv::Mat image(VKRT::h, VKRT::w, CV_8UC3, cv::Scalar(0, 0, 0));
 	{
 		Timer timer{ "Rendering" };
 #pragma omp parallel for
-		for (std::size_t j = VKRT::ST_h - 1; j > 0; --j) {
+		for (int y = VKRT::h - 1; y >= 0; y--) {
 #ifdef LOG_PROGRESS
-			if ((j % 50) == 0) {
+			if ((y % 50) == 0) {
 				RTINFO("Scanlines remaining : {}", j);
 			}
 #endif // LOG_PROGRESS
-			auto g = CAST_D(j) * invStHMinusOne;
+			auto g = y * invStHMinusOne;
+#pragma omp parallel for
+			for (int x = 0; x < VKRT::w; x++) {
+				auto r = x * invStWMinusOne;
 
-			for (std::size_t i = 0; i < VKRT::ST_w; ++i) {
-				auto r = CAST_D(i) * invStWMinusOne;
-				auto colorX = VKRT::scale * r;
-				auto colorY = VKRT::scale * g;
-				auto colorZ = 63.999975;
-				index = (j * VKRT::ST_w + i) * VKRT::nCh;
-				imageData[index] = CAST_UC(colorX);
-				imageData[index + 1] = CAST_UC(colorY);
-				imageData[index + 2] = CAST_UC(colorZ);
+				auto ir = CAST_UC(256 * r);
+				auto ig = CAST_UC(256 * g);
+				auto ib = CAST_UC(64.0); // 256.0 * 0,25
+
+				// Impostazione del colore del pixel nell'immagine
+				image.at<cv::Vec3b>(y, x) = cv::Vec3b(ib, ig, ir);
 			}
 		}
 	}
-
-
 	// Write the image data to a PNG file
-	if (stbi_write_png(filename, VKRT::ST_w, VKRT::ST_h, VKRT::nCh, imageData.data(), VKRT::ST_w * VKRT::nCh) == 0) {
+	if (!cv::imwrite(filename, image)) {
 		// Error handling in case the image writing fails
 		RTERROR("Failed to write image file: {}", filename);
 		return;
@@ -104,6 +104,7 @@ void generatePNGImage(const char* filename)
 
 	RTINFO("Image saved to file: {}", filename);
 }
+
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 {
 	spdlog::set_pattern(R"(%^[%T] [%l] %v%$)");
