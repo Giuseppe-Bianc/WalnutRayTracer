@@ -20,16 +20,8 @@
 #pragma warning(disable : 6386 6385)
 #endif
 
-#include <opencv2/opencv.hpp>
-#include <omp.h>
-#include <iterator>
-#include <execution>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-#include <spdlog/cfg/env.h>
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -38,6 +30,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <execution>
 #include <format>
 #include <fstream>
 #include <glm/glm.hpp>
@@ -48,12 +41,19 @@
 #include <glm/gtx/string_cast.hpp>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <numbers>
+#include <omp.h>
+#include <opencv2/opencv.hpp>
 #include <optional>
 #include <random>
 #include <set>
+#include <spdlog/cfg/env.h>
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
@@ -65,8 +65,7 @@
 #pragma warning(pop)
 #endif
 
-[[nodiscard]] static constexpr auto calcolaCentro(const unsigned int width, const unsigned int w) noexcept
-{
+[[nodiscard]] static constexpr auto calcolaCentro(const unsigned int width, const unsigned int w) noexcept {
     return (width - w) / 2;
 }
 
@@ -95,8 +94,7 @@
     std::cin.ignore();
 
 using ddvector = std::vector<std::vector<double>>;
-namespace VKRT
-{
+namespace VKRT {
     static inline constexpr bool FWDTF = true;
     static inline constexpr bool BCKTF = false;
     static inline constexpr double MAX_COLOR = 255.0;
@@ -105,16 +103,22 @@ namespace VKRT
     static inline constexpr long NANOD = static_cast<long>(std::nano::den);
     static inline constexpr long double pi = std::numbers::pi_v<long double>;
     // Dimensioni della finestra
-    static inline constexpr int w = 1024;
-    static inline constexpr double aspect_ratio = 16.0 / 9.0;
+    // static inline constexpr double aspect_ratio = 16.0 / 9.0;
+    static inline constexpr double aspect_ratioW = 16.0;
+    static inline constexpr double aspect_ratioH = 9.0;
+    static inline constexpr int imageF = 64;
+    static inline constexpr int windowF = 68;
+    static inline constexpr int w = CAST_I(aspect_ratioW * imageF);
+    static inline constexpr int h = CAST_I(aspect_ratioH * imageF);
+    static inline constexpr int wind_w = CAST_I(aspect_ratioW * windowF);
+    static inline constexpr int wind_h = CAST_I(aspect_ratioH * windowF);
     static inline constexpr int samples_per_pixel = 100;
     static inline constexpr int max_depth = 50;
-    static inline constexpr int h = CAST_I(CAST_D(w / aspect_ratio));
     static inline constexpr std::size_t ST_w = CAST_ST(w);
     static inline constexpr std::size_t ST_h = CAST_ST(h);
-    static inline constexpr std::size_t nCh = 3;
-    static inline constexpr std::size_t dataSize = ST_w * ST_h * nCh;
-    static inline constexpr double scale = 255.99999;
+    static inline constexpr std::size_t ST_wind_w = CAST_ST(wind_w);
+    static inline constexpr std::size_t ST_wind_h = CAST_ST(wind_h);
+    static inline constexpr double scale = 256.0;
     static inline constexpr std::string_view windowTitle = "Ray Tracer";
 }  // namespace VKRT
 static inline constexpr long long kNanoSecondsInMicrosecond = 1000;

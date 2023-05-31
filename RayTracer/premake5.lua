@@ -24,11 +24,6 @@ project "RayTracer"
       "external/opencv/build/x64/vc16/lib"  -- Replace with the path to your OpenCV library directory
    }
 
-   links
-   {
-       "Walnut",
-       "opencv_world470d"
-   }
 
    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
    objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
@@ -37,16 +32,25 @@ project "RayTracer"
       systemversion "latest"
       defines { "WL_PLATFORM_WINDOWS" }
 
+
    filter "configurations:Debug"
       defines { "WL_DEBUG" }
       runtime "Debug"
       symbols "On"
+      links {
+         "Walnut",
+         "opencv_world470d"
+      }
 
    filter "configurations:Release"
       defines { "WL_RELEASE" }
       runtime "Release"
       optimize "On"
       symbols "On"
+      links {
+         "Walnut",
+         "opencv_world470"
+      }
 
    filter "configurations:Dist"
       kind "WindowedApp"
@@ -54,3 +58,7 @@ project "RayTracer"
       runtime "Release"
       optimize "On"
       symbols "Off"
+      links {
+         "Walnut",
+         "opencv_world470"
+      }
