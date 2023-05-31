@@ -68,13 +68,22 @@
 [[nodiscard]] static constexpr auto calcolaCentro(const unsigned int width, const unsigned int w) noexcept {
     return (width - w) / 2;
 }
-
+#ifndef _DIST
 #define RTTRACE(...) SPDLOG_TRACE(__VA_ARGS__)
 #define RTDEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
 #define RTINFO(...) SPDLOG_INFO(__VA_ARGS__)
 #define RTWARN(...) SPDLOG_WARN(__VA_ARGS__)
 #define RTERROR(...) SPDLOG_ERROR(__VA_ARGS__)
 #define RTCRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#else
+#define RTTRACE(...)
+#define RTDEBUG(...)
+#define RTINFO(...)
+#define RTWARN(...)
+#define RTERROR(...)
+#define RTCRITICAL(...)
+#endif  // !_DIST
+
 #define CAST_ST(x) static_cast<std::size_t>((x))
 #define CAST_CPCU32T(x) static_cast<const uint32_t *>(static_cast<const void *>((x)))
 #define CAST_UC(x) static_cast<unsigned char>((x))
@@ -88,7 +97,6 @@
 #define CALC_CENTRO(width, w) calcolaCentro((width), (w))
 #define PRINT(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__ << std::endl;
 #define PRINTNNL(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__;
-#define GLWFERR(error, description) RTERROR("GLFW Error ({}): {}", error, description);
 #define RTSYSPAUSE()                                                                                                             \
     RTINFO("Press enter to exit...");                                                                                            \
     std::cin.ignore();
@@ -97,7 +105,6 @@ using ddvector = std::vector<std::vector<double>>;
 namespace VKRT {
     static inline constexpr bool FWDTF = true;
     static inline constexpr bool BCKTF = false;
-    static inline constexpr double MAX_COLOR = 255.0;
     static inline constexpr double NO_COLOR = 0.0;
     static inline constexpr double EPSILON = 1e-22;
     static inline constexpr long NANOD = static_cast<long>(std::nano::den);
