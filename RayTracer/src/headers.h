@@ -89,8 +89,8 @@
 #define PRINT(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__ << std::endl;
 #define PRINTNNL(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__;
 #define GLWFERR(error, description) RTERROR("GLFW Error ({}): {}", error, description);
-#define RTSYSPAUSE()                                                                                                   \
-    RTINFO("Press enter to exit...");                                                                                  \
+#define RTSYSPAUSE()                                                                                                             \
+    RTINFO("Press enter to exit...");                                                                                            \
     std::cin.ignore();
 
 using ddvector = std::vector<std::vector<double>>;

@@ -6,7 +6,7 @@
 #define LOG_PROGRESS
 
 class RayTracerLayer : public Walnut::Layer {
-   public:
+public:
     virtual void OnUpdate(float ts) override {}
     virtual void OnUIRender() override {
         ImGui::Begin(VKRT::windowTitle.data());
@@ -24,7 +24,7 @@ class RayTracerLayer : public Walnut::Layer {
         RTINFO("rendering imagine {} w:{} h:{}", image_name, image->GetWidth(), image->GetHeight());
     }
 
-   private:
+private:
     uint32_t GenerateRandomColor() const noexcept {
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -36,8 +36,8 @@ class RayTracerLayer : public Walnut::Layer {
 };
 
 class ImageGenerator {
-   public:
-   private:
+public:
+private:
 };
 
 void generatePNGImageData(cv::Mat &image) {
