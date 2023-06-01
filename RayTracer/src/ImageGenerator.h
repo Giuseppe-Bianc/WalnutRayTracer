@@ -23,9 +23,26 @@ public:
         RTINFO("Image saved to file: {}", filename);
     }
 
+// Function to generate a PNG image
+#pragma optimize("gt", on)
+    static inline void generatePNGImagefromUint32(const char *filename, const uint32_t *imageData, int width, int height) {
+        // Creazione di un'immagine nera
+        cv::Mat image = convertUint32ArrayToMat(imageData, width, height);
+        // Write the image data to a PNG file
+        if(!cv::imwrite(filename, image)) {
+            // Error handling in case the image writing fails
+            RTERROR("Failed to write image file: {}", filename);
+            return;
+        }
+
+        RTINFO("Image saved to file: {}", filename);
+    }
+
 private:
     static void generatePNGImageData(cv::Mat &image) {
-        Timer timer{"Rendering"};
+#ifdef _DEBUG
+        WLRT::Timer timer{"Rendering"};
+#endif
 #pragma omp parallel for
         for(int y = VKRT::h - 1; y >= 0; y--) {
 #ifdef LOG_PROGRESS
@@ -46,5 +63,27 @@ private:
                 image.at<cv::Vec3b>(y, x) = cv::Vec3b(ib, ig, ir);
             }
         }
+    }
+    static cv::Mat convertUint32ArrayToMat(const uint32_t *imageData, int width, int height) {
+        // Creazione di un oggetto cv::Mat con dimensioni e tipo appropriati
+        cv::Mat image(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
+
+        // Copia dei dati dall'array uint32_t all'immagine cv::Mat
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                // Ottenimento del valore uint32_t dal puntatore all'array
+                uint32_t pixelValue = imageData[y * width + x];
+
+                // Estrazione dei componenti di colore (canali BGR)
+                uint8_t blue = (pixelValue >> 0) & 0xFF;
+                uint8_t green = (pixelValue >> 8) & 0xFF;
+                uint8_t red = (pixelValue >> 16) & 0xFF;
+
+                // Impostazione del valore del pixel nell'immagine cv::Mat
+                image.at<cv::Vec3b>(y, x) = cv::Vec3b(blue, green, red);
+            }
+        }
+
+        return image;
     }
 };

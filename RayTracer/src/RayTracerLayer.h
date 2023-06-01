@@ -1,35 +1,59 @@
 #pragma once
-#include "Timer.h"
+#include "ImageGenerator.h"
+#include "Walnut/Application.h"
+#include "Walnut/EntryPoint.h"
+
 #include "Walnut/Image.h"
-#include "Walnut/Layer.h"
-#include "headers.h"
+#include "Walnut/Timer.h"
+
+#include "Renderer.h"
+
+using namespace Walnut;
 
 class RayTracerLayer : public Walnut::Layer {
 public:
-    virtual void OnUpdate(float ts) override {}
     virtual void OnUIRender() override {
-        ImGui::Begin(VKRT::windowTitle.data());
-        ImGui::Image(image->GetDescriptorSet(), ImVec2(CAST_F(image->GetWidth()), CAST_F(image->GetHeight())));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+        ImGui::Begin("Settings");
+        ImGui::Text("Last render: %.3fms", m_LastRenderTime);
+        if(ImGui::Button("Render")) {
+            Render();
+        }
+        if(ImGui::Button("Render on image")) {
+            RenderOnImage();
+        }
         ImGui::End();
+
+        ImGui::Begin("Viewport");
+
+        m_ViewportWidth = ImGui::GetContentRegionAvail().x;
+        m_ViewportHeight = ImGui::GetContentRegionAvail().y;
+
+        auto image = m_Renderer.GetFinalImage();
+        if(image)
+            ImGui::Image(image->GetDescriptorSet(), {CAST_F(image->GetWidth()), CAST_F(image->GetHeight())}, {0, 1}, {1, 0});
+
+        ImGui::End();
+        ImGui::PopStyleVar();
+
+        Render();
     }
 
-    RayTracerLayer() {
-        loadImage();
-        RTINFO("rendering imagine {} w:{} h:{}", image_name, image->GetWidth(), image->GetHeight());
+    inline void RenderOnImage() {
+        m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+        m_Renderer.RenderOnImage();
+    }
+
+    void Render() {
+        Timer timer;
+        m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+        m_Renderer.Render();
+        m_LastRenderTime = timer.ElapsedMillis();
     }
 
 private:
-    inline void loadImage() {
-        Timer timer("Image loaded in memory");
-        image = std::make_shared<Walnut::Image>(image_name);
-    }
-    uint32_t GenerateRandomColor() const noexcept {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> dis(0, 256);
-        return dis(gen);
-    }
-    std::string_view image_name = "texture.png";
-    std::shared_ptr<Walnut::Image> image;
-    // std::vector<uint32_t> image_data;
+    Renderer m_Renderer;
+    uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+    float m_LastRenderTime = 0.0f;
 };
