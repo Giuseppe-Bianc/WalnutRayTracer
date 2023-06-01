@@ -23,8 +23,9 @@ void Renderer::OnResize(uint32_t width, uint32_t height) {
 void Renderer::Render() {
 #pragma omp parallel for
     for(uint32_t y = 0; y < m_FinalImage->GetHeight(); y++) {
+        auto v = CAST_F(y) / CAST_F(m_FinalImage->GetHeight());
         for(uint32_t x = 0; x < m_FinalImage->GetWidth(); x++) {
-            glm::vec2 coord = {CAST_F(x) / CAST_F(m_FinalImage->GetWidth()), CAST_F(y) / CAST_F(m_FinalImage->GetHeight())};
+            glm::vec2 coord = {CAST_F(x) / CAST_F(m_FinalImage->GetWidth()), v};
             coord = coord * 2.0f - 1.0f;  // -1 -> 1
             m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(coord);
         }
