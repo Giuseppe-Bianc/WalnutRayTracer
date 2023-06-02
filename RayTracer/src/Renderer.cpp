@@ -21,11 +21,12 @@ void Renderer::OnResize(uint32_t width, uint32_t height) {
 
 #pragma optimize("gt", on)
 void Renderer::Render() {
+    glm::vec2 coord = {};
 #pragma omp parallel for
     for(uint32_t y = 0; y < m_FinalImage->GetHeight(); y++) {
         auto v = CAST_F(y) / CAST_F(m_FinalImage->GetHeight());
         for(uint32_t x = 0; x < m_FinalImage->GetWidth(); x++) {
-            glm::vec2 coord = {CAST_F(x) / CAST_F(m_FinalImage->GetWidth()), v};
+            coord = {CAST_F(x) / CAST_F(m_FinalImage->GetWidth()), v};
             coord = coord * 2.0f - 1.0f;  // -1 -> 1
             m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(coord);
         }
@@ -53,12 +54,12 @@ uint32_t Renderer::PerPixel(glm::vec2 coord) const noexcept {
 
     float a = glm::dot(rayDirection, rayDirection);
     float b = 2.0f * glm::dot(rayOrigin, rayDirection);
-    float c = glm::dot(rayOrigin, rayOrigin) - radius * radius;
+    float c = glm::dot(rayOrigin, rayOrigin) - POW2(radius);
 
     // Quadratic forumula discriminant:
     // b^2 - 4ac
 
-    float discriminant = b * b - 4.0f * a * c;
+    float discriminant = POW2(b) - 4.0f * a * c;
     if(discriminant >= 0.0f)
         return 0xffff00ff;
 

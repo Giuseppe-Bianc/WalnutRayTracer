@@ -12,11 +12,9 @@ project "RayTracer"
       "../Walnut/vendor/imgui",
       "../Walnut/vendor/glfw/include",
       "../Walnut/vendor/glm",
-
       "../Walnut/Walnut/src",
       "external/spdlog/include",
       "external/opencv/build/include",
-
       "%{IncludeDir.VulkanSDK}",
    }
 
@@ -32,24 +30,26 @@ project "RayTracer"
       systemversion "latest"
       defines { "WL_PLATFORM_WINDOWS" }
 
-
    filter "configurations:Debug"
       defines { "WL_DEBUG" }
       runtime "Debug"
+      inlining "Auto"
       symbols "On"
       links {
          "Walnut",
-         "opencv_world470d"
+         "opencv_world470d",
       }
 
    filter "configurations:Release"
       defines { "WL_RELEASE" }
       runtime "Release"
       optimize "On"
+      inlining "Auto"
       symbols "On"
+      flags { "LinkTimeOptimization", "MultiProcessorCompile"} 
       links {
          "Walnut",
-         "opencv_world470"
+         "opencv_world470",
       }
 
    filter "configurations:Dist"
@@ -57,8 +57,11 @@ project "RayTracer"
       defines { "WL_DIST" }
       runtime "Release"
       optimize "On"
+      inlining "Auto"
       symbols "Off"
+      omitframepointer "On"
+      flags { "LinkTimeOptimization", "MultiProcessorCompile", "NoBufferSecurityCheck", "NoIncrementalLink" }
       links {
          "Walnut",
-         "opencv_world470"
+         "opencv_world470",
       }

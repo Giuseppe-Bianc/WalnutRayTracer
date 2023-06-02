@@ -97,6 +97,7 @@
 #define CALC_CENTRO(width, w) calcolaCentro((width), (w))
 #define PRINT(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__ << std::endl;
 #define PRINTNNL(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__;
+#define POW2(p) (p) * (p)
 #define RTSYSPAUSE()                                                                                                             \
     RTINFO("Press enter to exit...");                                                                                            \
     std::cin.ignore();
