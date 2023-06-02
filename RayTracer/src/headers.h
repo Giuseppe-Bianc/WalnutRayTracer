@@ -36,8 +36,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iomanip>
 #include <iostream>
@@ -84,16 +86,17 @@
 #define RTCRITICAL(...)
 #endif  // !_DIST
 
-#define CAST_ST(x) static_cast<std::size_t>((x))
-#define CAST_CPCU32T(x) static_cast<const uint32_t *>(static_cast<const void *>((x)))
-#define CAST_UC(x) static_cast<unsigned char>((x))
-#define CAST_32T(x) static_cast<int32_t>((x))
-#define CAST_U32T(x) static_cast<uint32_t>((x))
-#define CAST_U8(x) static_cast<Uint8>((x))
-#define CAST_I(x) static_cast<int>((x))
-#define CAST_L(x) static_cast<long>((x))
-#define CAST_D(x) static_cast<double>((x))
-#define CAST_F(x) static_cast<float>((x))
+#define CAST_ST(x) static_cast<std::size_t>(x)
+#define CAST_CPCU32T(x) static_cast<const uint32_t *>(static_cast<const void *>(x))
+#define CAST_UC(x) static_cast<unsigned char>(x)
+#define CAST_32T(x) static_cast<int32_t>(x)
+#define CAST_U32T(x) static_cast<uint32_t>(x)
+#define CAST_U8T(c) static_cast<uint8_t>(x)
+#define CAST_U8(x) static_cast<Uint8>(x)
+#define CAST_I(x) static_cast<int>(x)
+#define CAST_L(x) static_cast<long>(x)
+#define CAST_D(x) static_cast<double>(x)
+#define CAST_F(x) static_cast<float>(x)
 #define CALC_CENTRO(width, w) calcolaCentro((width), (w))
 #define PRINT(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__ << std::endl;
 #define PRINTNNL(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__;

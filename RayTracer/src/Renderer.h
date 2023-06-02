@@ -2,19 +2,21 @@
 #include "Walnut/Image.h"
 #include "headers.h"
 
+#include "Camera.h"
+#include "Ray.h"
 class Renderer {
 public:
     Renderer() = default;
     //~Renderer() {}
 
     void OnResize(uint32_t width, uint32_t height);
-    void Render();
+    void Render(const Camera &camera);
     void RenderOnImage() const noexcept;
 
     std::shared_ptr<Walnut::Image> GetFinalImage() const noexcept { return m_FinalImage; }
 
 private:
-    uint32_t PerPixel(glm::vec2 coord) const noexcept;
+    glm::vec4 TraceRay(const Ray &ray);
 
 private:
     std::size_t aspectratio{};
