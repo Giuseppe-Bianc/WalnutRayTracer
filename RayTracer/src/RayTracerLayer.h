@@ -2,58 +2,45 @@
 #include "ImageGenerator.h"
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
+#include "Walnut/Image.h"
 
 #include "Walnut/Image.h"
 #include "Walnut/Timer.h"
-
-#include "Renderer.h"
 
 using namespace Walnut;
 
 class RayTracerLayer : public Walnut::Layer {
 public:
+    virtual void OnAttach() override {
+        image = std::make_shared<Image>("texture.png");
+        renderingTime = std::format("Tempo creazione immagine: {:6.4f} ms", time);
+    }
     virtual void OnUIRender() override {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
-        ImGui::Begin("Settings");
-        ImGui::Text("Last render: %.3fms", m_LastRenderTime);
-        if(ImGui::Button("Render")) {
-            Render();
-        }
-        if(ImGui::Button("Render on image")) {
-            RenderOnImage();
-        }
-        ImGui::End();
-
         ImGui::Begin("Viewport");
 
-        m_ViewportWidth = ImGui::GetContentRegionAvail().x;
-        m_ViewportHeight = ImGui::GetContentRegionAvail().y;
+        ImGui::Image(image->GetDescriptorSet(), {CAST_F(image->GetWidth()), CAST_F(image->GetHeight())});
 
-        auto image = m_Renderer.GetFinalImage();
-        if(image)
-            ImGui::Image(image->GetDescriptorSet(), {CAST_F(image->GetWidth()), CAST_F(image->GetHeight())}, {0, 1}, {1, 0});
+        if(time != 0.0 && time != -1.0) {
+            ImVec2 textSize = ImGui::CalcTextSize(renderingTime.c_str());
+
+            // Calculate the position to center the text horizontally
+            float textPosOffset = (190 + (textSize.x * 0.5f));
+
+            // Display the text above the image
+            ImGui::SetCursorPos({CAST_F(image->GetWidth() - textPosOffset), CAST_F(image->GetHeight() - 50)});
+            ImGui::Text(renderingTime.c_str());
+        }
 
         ImGui::End();
         ImGui::PopStyleVar();
-
-        Render();
-    }
-
-    inline void RenderOnImage() {
-        m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
-        m_Renderer.RenderOnImage();
-    }
-
-    void Render() {
-        Timer timer;
-        m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
-        m_Renderer.Render();
-        m_LastRenderTime = timer.ElapsedMillis();
     }
 
 private:
-    Renderer m_Renderer;
-    uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+    std::shared_ptr<Image> image;
+    double time{};
+    std::string renderingTime;
 
-    float m_LastRenderTime = 0.0f;
+public:
+    RayTracerLayer(double time) : time(time) {}
 };

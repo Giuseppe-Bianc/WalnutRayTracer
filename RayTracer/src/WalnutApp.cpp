@@ -13,9 +13,12 @@ Walnut::Application *Walnut::CreateApplication(int argc, char **argv) {
     spdlog::set_default_logger(console);
     Walnut::ApplicationSpecification spec;
     spec.Name = VKRT::windowTitle.data();
-    RTINFO("crazione finestra {} w:{} h:{}", spec.Name, spec.Width, spec.Height);
-
+    spec.Width = VKRT::w;
+    spec.Height = VKRT::h;
+    VKINFO("crazione finestra {} w:{} h:{}", spec.Name, spec.Width, spec.Height);
+    double time = ImageGenerator::generatePNGImage("texture.png");
+    auto raytracer = std::make_shared<RayTracerLayer>(time);
     Walnut::Application *app = new Walnut::Application(spec);
-    app->PushLayer<RayTracerLayer>();
+    app->PushLayer(raytracer);
     return app;
 }

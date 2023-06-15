@@ -1,5 +1,6 @@
 #pragma once
 #include "Timer.h"
+#include "Walnut/Timer.h"
 #include "headers.h"
 #ifdef _DEBUG
 #define LOG_PROGRESS
@@ -9,18 +10,19 @@ class ImageGenerator {
 public:
 // Function to generate a PNG image
 #pragma optimize("gt", on)
-    static inline void generatePNGImage(const char *filename) {
+    static inline double generatePNGImage(const char *filename) {
         // Creazione di un'immagine nera
         cv::Mat image(VKRT::h, VKRT::w, CV_8UC3, cv::Scalar(0, 0, 0));
-        generatePNGImageData(image);
+        double time = generatePNGImageData(image);
         // Write the image data to a PNG file
         if(!cv::imwrite(filename, image)) {
             // Error handling in case the image writing fails
-            RTERROR("Failed to write image file: {}", filename);
-            return;
+            VKERROR("Failed to write image file: {}", filename);
+            return -1.0;
         }
 
-        RTINFO("Image saved to file: {}", filename);
+        VKINFO("Image saved to file: {}", filename);
+        return time;
     }
 
 // Function to generate a PNG image
@@ -31,23 +33,25 @@ public:
         // Write the image data to a PNG file
         if(!cv::imwrite(filename, image)) {
             // Error handling in case the image writing fails
-            RTERROR("Failed to write image file: {}", filename);
+            VKERROR("Failed to write image file: {}", filename);
             return;
         }
 
-        RTINFO("Image saved to file: {}", filename);
+        VKINFO("Image saved to file: {}", filename);
     }
 
 private:
-    static void generatePNGImageData(cv::Mat &image) {
+    static double generatePNGImageData(cv::Mat &image) {
 #ifdef _DEBUG
         WLRT::Timer timer{"Rendering"};
+#else
+        Walnut::Timer timer;
 #endif
 #pragma omp parallel for
         for(int y = VKRT::h - 1; y >= 0; y--) {
 #ifdef LOG_PROGRESS
             if((y % 50) == 0) {
-                RTINFO("Scanlines remaining : {}", y);
+                VKINFO("Scanlines remaining : {}", y);
             }
 #endif  // LOG_PROGRESS
             auto g = y * invStHMinusOne;
@@ -63,6 +67,12 @@ private:
                 image.at<cv::Vec3b>(y, x) = cv::Vec3b(ib, ig, ir);
             }
         }
+#ifdef _DEBUG
+        return 0;
+#else
+        double time = timer.ElapsedMillis();
+        return time;
+#endif
     }
     static cv::Mat convertUint32ArrayToMat(const uint32_t *imageData, int width, int height) {
         // Creazione di un oggetto cv::Mat con dimensioni e tipo appropriati

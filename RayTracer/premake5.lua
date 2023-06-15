@@ -1,7 +1,7 @@
 project "RayTracer"
    kind "ConsoleApp"
    language "C++"
-   cppdialect "C++20"
+   cppdialect "C++latest"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
@@ -31,7 +31,7 @@ project "RayTracer"
       defines { "WL_PLATFORM_WINDOWS" }
 
    filter "configurations:Debug"
-      defines { "WL_DEBUG" }
+      defines { "WL_DEBUG", "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG" }
       runtime "Debug"
       inlining "Auto"
       symbols "On"
@@ -41,7 +41,7 @@ project "RayTracer"
       }
 
    filter "configurations:Release"
-      defines { "WL_RELEASE" }
+      defines { "WL_RELEASE", "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE" }
       runtime "Release"
       optimize "On"
       inlining "Auto"
@@ -54,7 +54,7 @@ project "RayTracer"
 
    filter "configurations:Dist"
       kind "WindowedApp"
-      defines { "WL_DIST" }
+      defines { "WL_DIST", "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_ERROR" }
       runtime "Release"
       optimize "On"
       inlining "Auto"

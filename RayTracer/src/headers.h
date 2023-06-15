@@ -1,9 +1,9 @@
 #pragma once
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#define GLFW_INCLUDE_VULKAN
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLM_FORCE_SILENT_WARNINGS
 #define GLM_FORCE_RADIANS
-// #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_WIN32
 #define GLM_FORCE_SIZE_T_LENGTH
 #define GLM_FORCE_PURE
@@ -14,6 +14,7 @@
 #define GLM_FORCE_PRECISION_HIGHP_DOUBLE
 #define GLM_FORCE_PRECISION_HIGHP_INT
 #define GLM_FORCE_PRECISION_HIGHP_FLOAT
+#define VMA_IMPLEMENTATION
 #ifdef _MSC_VER
 // Microsoft Visual C++ Compiler
 #pragma warning(push)
@@ -56,11 +57,15 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+#include <spirv-tools/libspirv.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
 #include <unordered_set>
 #include <vector>
+#include <vma/vk_mem_alloc.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 // Restore warning levels.
 #ifdef _MSC_VER
 // Microsoft Visual C++ Compiler
@@ -71,19 +76,19 @@
     return (width - w) / 2;
 }
 #ifndef _DIST
-#define RTTRACE(...) SPDLOG_TRACE(__VA_ARGS__)
-#define RTDEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
-#define RTINFO(...) SPDLOG_INFO(__VA_ARGS__)
-#define RTWARN(...) SPDLOG_WARN(__VA_ARGS__)
-#define RTERROR(...) SPDLOG_ERROR(__VA_ARGS__)
-#define RTCRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
+#define VKTRACE(...) SPDLOG_TRACE(__VA_ARGS__)
+#define VKDEBUG(...) SPDLOG_DEBUG(__VA_ARGS__)
+#define VKINFO(...) SPDLOG_INFO(__VA_ARGS__)
+#define VKWARN(...) SPDLOG_WARN(__VA_ARGS__)
+#define VKERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#define VKCRITICAL(...) SPDLOG_CRITICAL(__VA_ARGS__)
 #else
-#define RTTRACE(...)
-#define RTDEBUG(...)
-#define RTINFO(...)
-#define RTWARN(...)
-#define RTERROR(...)
-#define RTCRITICAL(...)
+#define VKTRACE(...)
+#define VKDEBUG(...)
+#define VKINFO(...)
+#define VKWARN(...)
+#define VKERROR(...)
+#define VKCRITICAL(...)
 #endif  // !_DIST
 
 #define CAST_ST(x) static_cast<std::size_t>(x)
@@ -97,12 +102,17 @@
 #define CAST_L(x) static_cast<long>(x)
 #define CAST_D(x) static_cast<double>(x)
 #define CAST_F(x) static_cast<float>(x)
-#define CALC_CENTRO(width, w) calcolaCentro((width), (w))
+#define CALC_CENTRO(width, w) calcolaCentro(width, w)
 #define PRINT(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__ << std::endl;
 #define PRINTNNL(p, ...) std::cout << std::fixed << std::setprecision(p) << __VA_ARGS__;
 #define POW2(p) (p) * (p)
-#define RTSYSPAUSE()                                                                                                             \
-    RTINFO("Press enter to exit...");                                                                                            \
+#define GLWFERR(error, description) VKERROR("GLFW Error ({}): {}", error, description);
+#define PRINTVER(version)                                                                                                        \
+    VKINFO("System can support vulkan Variant: {}, Major: {}, Minor: {}", VK_API_VERSION_VARIANT(version),                       \
+           VK_API_VERSION_MAJOR(version), VK_API_VERSION_MINOR(version), VK_API_VERSION_PATCH(version))
+
+#define VKSYSPAUSE()                                                                                                             \
+    VKINFO("Press enter to exit...");                                                                                            \
     std::cin.ignore();
 
 using ddvector = std::vector<std::vector<double>>;
@@ -111,7 +121,7 @@ namespace VKRT {
     static inline constexpr bool BCKTF = false;
     static inline constexpr double NO_COLOR = 0.0;
     static inline constexpr double EPSILON = 1e-22;
-    static inline constexpr long NANOD = static_cast<long>(std::nano::den);
+    static inline constexpr long NANOD = std::nano::den;
     static inline constexpr long double pi = std::numbers::pi_v<long double>;
     // Dimensioni della finestra
     // static inline constexpr double aspect_ratio = 16.0 / 9.0;
